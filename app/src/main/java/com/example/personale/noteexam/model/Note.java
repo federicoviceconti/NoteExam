@@ -20,8 +20,8 @@ public class Note implements Parcelable {
         id = builderNote._id;
         color = builderNote._color;
         title = builderNote._title;
-        specialNote = builderNote._specialNote;
         description = builderNote._description;
+        specialNote = builderNote._specialNote;
         creationDate = builderNote._creationDate;
         expirationDate = builderNote._expirationDate;
         lastEditDate = builderNote._lastEditDate;

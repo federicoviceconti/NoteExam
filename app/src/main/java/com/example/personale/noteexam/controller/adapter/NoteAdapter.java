@@ -86,6 +86,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteVH> {
         }
     }
 
+    public void searchNote(String searchedText){
+        listNotes.searchIntoDb(searchedText);
+        notifyDataSetChanged();
+    }
+
     public void deleteNote(int pos){
         listNotes.delete(pos);
         notifyItemRemoved(pos);
@@ -106,6 +111,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteVH> {
     public NoteAdapter setPosition(int position) {
         this.position = position;
         return this;
+    }
+
+    public void order(int stateOrder) {
+        listNotes.orderBy(stateOrder);
+        notifyDataSetChanged();
     }
 
     class NoteVH extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener {

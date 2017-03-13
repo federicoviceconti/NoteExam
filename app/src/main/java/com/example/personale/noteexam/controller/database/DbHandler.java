@@ -125,6 +125,33 @@ public class DbHandler extends SQLiteOpenHelper {
         return notes;
     }
 
+    public ArrayList<Note> getAllNotesByText(String text) {
+        ArrayList<Note> notes = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + DbField.TABLE_NOTE + " WHERE " + DbField.TITLE + " LIKE '%" + text + "%'", null);
+
+        if(c.moveToFirst()){
+            do{
+                notes.add(new Note.BuilderNote()
+                        .set_title(c.getString(c.getColumnIndex(DbField.TITLE)))
+                        .set_specialNote(setSpecial(Integer.parseInt(c.getString(c.getColumnIndex(DbField.SPECIAL)))))
+                        .set_description(c.getString(c.getColumnIndex(DbField.DESCRIPTION)))
+                        .set_color(Integer.parseInt(c.getString(c.getColumnIndex(DbField.COLOR))))
+                        .set_creationDate(new Date(Long.parseLong(c.getString(c.getColumnIndex(DbField.CREATIONDATE)))))
+                        .set_expirationDate(new Date(Long.parseLong(c.getString(c.getColumnIndex(DbField.EXPIRATIONDATE)))))
+                        .set_lastEditDate(new Date(Long.parseLong(c.getString(c.getColumnIndex(DbField.LASTEDITDATE)))))
+                        .set_id(Integer.parseInt(c.getString(c.getColumnIndex(DbField.ID))))
+                        .build()
+                );
+            }while(c.moveToNext());
+        }
+
+        db.close();
+
+        return notes;
+    }
+
     private int setSpecial(boolean special){
         return special ? 1 : 0;
     }

@@ -11,4 +11,7 @@ public class Field {
     public static final int STAGGERED_LAYOUT = 10;
     public static final int LINEAR_LAYOUT = 20;
     public static final String NOTE_OBJECT = "noteobject";
+    public static final int ORDER_ASC = 110;
+    public static final int ORDER_DESC = 120;
+    public static final String ERROR_FIELD = "Nothing changed!";
 }

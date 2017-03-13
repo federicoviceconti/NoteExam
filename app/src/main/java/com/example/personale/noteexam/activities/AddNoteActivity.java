@@ -78,8 +78,10 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
 
     private void setSpecial(MenuItem item, boolean isSpecial) {
         if (isSpecial) {
+            System.out.println("Special");
             item.setIcon(R.drawable.ic_bookmark_white_full);
         } else {
+            System.out.println("Not special");
             item.setIcon(R.drawable.ic_bookmark_white_empty);
         }
     }
@@ -108,6 +110,8 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void colorPicker() {
+        final float ALPHA = 1f;
+
         final ColorPickerView colorPickerView;
         AlertDialog.Builder colorPicker = Utilities.createPicker(this, colorPickerView = new ColorPickerView(this));
         colorPicker.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -116,9 +120,15 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 colorChoosed = colorPickerView.getColor() == Color.WHITE ? Color.GRAY : colorPickerView.getColor();
                 setColorActivity();
             }
-        });
+        })
+                .create()
+                .show(); //Build Alert Dialog
 
-        colorPicker.create().show();
+        //Build colopickerview
+        colorPickerView.showAlpha(false);
+        colorPickerView.setCurrentColor(getResources().getColor(android.R.color.darker_gray));
+        colorPickerView.showHex(false);
+        colorPickerView.setAlpha(ALPHA);
     }
 
     private void setColorActivity() {
@@ -166,7 +176,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             bodyEt.setText(n.getDescription());
 
             if (n.getExpirationDate().before(new Date(System.currentTimeMillis()))) {
-                dateExpiration.setText("Set new date!");
+                dateExpiration.setText(getResources().getString(R.string.set_new_date));
             } else {
                 dateExpiration.setText(new SimpleDateFormat("dd-MMM-yy").format(n.getExpirationDate()));
             }
@@ -174,9 +184,11 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             isSpecial = n.isSpecialNote();
             colorChoosed = n.getColor();
             setColorActivity();
-        } else if (getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(Intent.ACTION_SEND)) {
-            bodyEt.setText(getIntent().getStringExtra(Intent.EXTRA_TEXT));
+            setTitle("Modifica nota");
+        } else {
+            setTitle("Aggiungi nota");
         }
+
     }
 
     @Override

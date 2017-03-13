@@ -11,4 +11,8 @@
     <string name="mark">Mark</string>
     <string name="layout">Layout</string>
     <string name="order">Order</string>
+    <string name="search_note">Search note...</string>
+    <string name="insert_expiration_date">Insert expiration date</string>
+    <string name="set_new_date">Set new date!</string>
+    <string name="insert_title">Insert title…</string>
 </resources>

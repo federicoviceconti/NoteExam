@@ -3,9 +3,14 @@ package com.example.personale.noteexam.controller.list;
 import android.content.Context;
 
 import com.example.personale.noteexam.controller.database.DbHandler;
+import com.example.personale.noteexam.controller.utilities.Field;
+import com.example.personale.noteexam.model.CompareNoteAsc;
+import com.example.personale.noteexam.model.CompareNoteDesc;
 import com.example.personale.noteexam.model.Note;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by personale on 13/03/2017.
@@ -31,8 +36,8 @@ public class NoteList {
     }
 
     public void delete(int pos){
-        notes.remove(pos);
         dbHandler.delete(getNote(pos).getId());
+        notes.remove(pos);
     }
 
     public int getSize() {
@@ -45,5 +50,21 @@ public class NoteList {
 
     public void loadNoteFromDb() {
         this.notes = dbHandler.getAllNotes();
+    }
+
+    public void orderBy(int stateOrder) {
+        switch (stateOrder){
+            default:
+            case Field.ORDER_DESC:
+                Collections.sort(notes, new CompareNoteDesc());
+                break;
+            case Field.ORDER_ASC:
+                Collections.sort(notes, new CompareNoteAsc());
+                break;
+        }
+    }
+
+    public void searchIntoDb(String text) {
+        this.notes = dbHandler.getAllNotesByText(text);
     }
 }

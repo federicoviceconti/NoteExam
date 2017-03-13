@@ -11,11 +11,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.personale.noteexam.R;
 import com.example.personale.noteexam.controller.adapter.NoteAdapter;
@@ -30,8 +34,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     RecyclerView recyclerView;
     FloatingActionButton fabAdd;
+    EditText editText;
     NoteAdapter adapter;
     private int stateLayout;
+    private int stateOrder;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,8 +45,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         fabAdd = (FloatingActionButton) findViewById(R.id.main_add_fab);
         recyclerView = (RecyclerView) findViewById(R.id.main_recycler_list);
+        editText = (EditText) findViewById(R.id.main_search_et);
         initializeComponent();
+
         fabAdd.setOnClickListener(this);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(adapter != null) {
+                    adapter.searchNote(s.toString());
+                }
+            }
+        });
     }
 
     @Override
@@ -61,27 +83,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.layout:
+            case R.id.menu_main_layout:
                 setLayout(item);
+                break;
+            case R.id.menu_main_order:
+                setOrder(item);
                 break;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void setLayout(MenuItem item) {
-        switch (stateLayout){
-            case Field.STAGGERED_LAYOUT:
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                stateLayout = Field.LINEAR_LAYOUT;
-                break;
-            case Field.LINEAR_LAYOUT:
-                recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-                stateLayout = Field.STAGGERED_LAYOUT;
-                break;
-        }
-
-        item.setIcon(stateLayout == Field.LINEAR_LAYOUT ? R.drawable.linear : R.drawable.staggered);
     }
 
     @Override
@@ -94,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(requestCode == Field.ADD){
                 recyclerView.scrollToPosition(0);
             }
+        } else {
+            Toast.makeText(this, Field.ERROR_FIELD, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -112,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     stateLayout == Field.LINEAR_LAYOUT ? new LinearLayoutManager(this) : new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         }
 
+        setOrder();
         adapter.setAllNotes();
     }
 
@@ -141,4 +154,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         menuInflater.inflate(R.menu.menu_item, menu);
     }
 
+    private void setLayout(MenuItem item) {
+        switch (stateLayout){
+            case Field.STAGGERED_LAYOUT:
+                recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                stateLayout = Field.LINEAR_LAYOUT;
+                break;
+            case Field.LINEAR_LAYOUT:
+                recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                stateLayout = Field.STAGGERED_LAYOUT;
+                break;
+        }
+
+        item.setIcon(stateLayout == Field.LINEAR_LAYOUT ? R.drawable.linear : R.drawable.staggered);
+    }
+
+    public void setOrder(MenuItem order) {
+        if(setItemOrder() == Field.ORDER_DESC){
+            order.setIcon(R.drawable.ic_desc);
+        } else {
+            order.setIcon(R.drawable.ic_asc);
+        }
+    }
+
+    public void setOrder(){
+        setItemOrder();
+    }
+
+    public int setItemOrder(){
+        switch (stateOrder) {
+            default:
+                System.out.println("OK");
+                stateOrder = Field.ORDER_DESC;
+            case Field.ORDER_DESC:
+                adapter.order(stateOrder);
+                stateOrder = Field.ORDER_ASC;
+                break;
+            case Field.ORDER_ASC:
+                adapter.order(stateOrder);
+                stateOrder = Field.ORDER_DESC;
+                break;
+        }
+
+        return stateOrder;
+    }
 }

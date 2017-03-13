@@ -25,10 +25,6 @@ public class Utilities {
         return calendarBuilder;
     }
 
-    public void chooseColor(){
-
-    }
-
     public static AlertDialog.Builder createPicker(Context context, ColorPickerView colorPickerView) {
         AlertDialog.Builder colorPicker = new AlertDialog.Builder(context);
         colorPicker.setView(colorPickerView);

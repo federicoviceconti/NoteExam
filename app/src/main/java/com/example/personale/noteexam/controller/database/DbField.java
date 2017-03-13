@@ -6,7 +6,7 @@ package com.example.personale.noteexam.controller.database;
 
 class DbField {
     static final String DBNAME = "DbNotes";
-    static final int DBVER = 5;
+    static final int DBVER = 1;
     static final String TABLE_NOTE = "note";
     static final String ID = "id";
     static final String COLOR = "color";

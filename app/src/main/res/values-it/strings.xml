@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Appunti esame</string>
+    <string name="body">Corpo</string>
+    <string name="ok">Ok</string>
+    <string name="hint_insert_text">Inserisci il testo qui…</string>
+    <string name="name_layout_preferences">com.example.personale.STATELAYOUT</string>
+    <string name="state_layout_preferences">com.example.personale.SAVEDLAYOUT</string>
+    <string name="delete">Cancella</string>
+    <string name="mark">Speciale</string>
+    <string name="layout">Layout</string>
+    <string name="order">Ordina</string>
+    <string name="search_note">Cerca nota…</string>
+    <string name="insert_expiration_date">Inserisci la data di scadenza</string>
+    <string name="set_new_date">Selezione una nuova data!</string>
+    <string name="insert_title">Inserisci titolo</string>
+</resources>
