@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">NoteExam</string>
+    <string name="todo_text">Todo</string>
+    <string name="archived_text">Archived</string>
+    <string name="body">Body</string>
+    <string name="ok">Ok</string>
+    <string name="hint_insert_text">Insert your text here</string>
+    <string name="name_layout_preferences">com.example.personale.STATELAYOUT</string>
+    <string name="state_layout_preferences">com.example.personale.SAVEDLAYOUT</string>
+    <string name="delete">Delete</string>
+    <string name="mark">Mark</string>
+    <string name="layout">Layout</string>
+    <string name="order">Order</string>
+</resources>
