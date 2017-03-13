@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     RecyclerView recyclerView;
     FloatingActionButton fabAdd;
-    EditText editText;
+    EditText searchEt;
     NoteAdapter adapter;
     private int stateLayout;
     private int stateOrder;
@@ -45,11 +45,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         fabAdd = (FloatingActionButton) findViewById(R.id.main_add_fab);
         recyclerView = (RecyclerView) findViewById(R.id.main_recycler_list);
-        editText = (EditText) findViewById(R.id.main_search_et);
+        searchEt = (EditText) findViewById(R.id.main_search_et);
         initializeComponent();
 
         fabAdd.setOnClickListener(this);
-        editText.addTextChangedListener(new TextWatcher() {
+        searchEt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -107,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             Toast.makeText(this, Field.ERROR_FIELD, Toast.LENGTH_SHORT).show();
         }
+
+        searchEt.setText("");
     }
 
     private void initializeComponent() {

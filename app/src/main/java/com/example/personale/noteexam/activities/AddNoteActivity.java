@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.personale.noteexam.R;
 import com.example.personale.noteexam.controller.utilities.Field;
@@ -34,6 +35,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     Intent i;
     Date d;
     EditText bodyEt, titleEt, dateExpiration;
+    TextView dateCreation, dateLastEdit;
     Date expirationDate;
     private int colorChoosed = Color.GRAY;
     private boolean isSpecial;
@@ -46,6 +48,8 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         titleEt = (EditText) findViewById(R.id.add_title_et);
         bodyEt = (EditText) findViewById(R.id.add_body_et);
         dateExpiration = (EditText) findViewById(R.id.add_date_expiration);
+        dateCreation = (TextView) findViewById(R.id.creation_date);
+        dateLastEdit = (TextView) findViewById(R.id.last_edit_date);
         dateExpiration.setOnClickListener(this);
         initializeComponent(getIntent().getFlags(), getIntent());
     }
@@ -179,6 +183,11 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 dateExpiration.setText(getResources().getString(R.string.set_new_date));
             } else {
                 dateExpiration.setText(new SimpleDateFormat("dd-MMM-yy").format(n.getExpirationDate()));
+            }
+
+            if(n.getExpirationDate() != null && n.getCreationDate() != null){
+                dateCreation.setText(getString(R.string.creation_string) + new SimpleDateFormat("dd-MMM-yy hh:mm:ss").format(n.getCreationDate()));
+                dateLastEdit.setText(getString(R.string.last_edit_string) + new SimpleDateFormat("dd-MMM-yy").format(n.getExpirationDate()));
             }
 
             isSpecial = n.isSpecialNote();

@@ -13,4 +13,6 @@
     <string name="insert_expiration_date">Inserisci la data di scadenza</string>
     <string name="set_new_date">Selezione una nuova data!</string>
     <string name="insert_title">Inserisci titolo</string>
+    <string name="creation_string">Creazione:</string>
+    <string name="last_edit_string">Ultima modifica:</string>
 </resources>

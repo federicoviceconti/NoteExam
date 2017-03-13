@@ -15,4 +15,6 @@
     <string name="insert_expiration_date">Insert expiration date</string>
     <string name="set_new_date">Set new date!</string>
     <string name="insert_title">Insert title…</string>
+    <string name="creation_string">Creation:</string>
+    <string name="last_edit_string">Last edit:</string>
 </resources>

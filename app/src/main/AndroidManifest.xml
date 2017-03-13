@@ -19,6 +19,7 @@
         </activity>
 
         <activity android:name=".activities.AddNoteActivity"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenLayout|screenSize"/>
 
     </application>
