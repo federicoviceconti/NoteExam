@@ -54,16 +54,12 @@ public class DbHandler extends SQLiteOpenHelper {
         int res = (int)db.insert(DbField.TABLE_NOTE, null, values);
         n.setId(res);
 
-        Log.d("DbHandler Insert", "Id: " + n.getId());
-
         return res;
     }
 
     public int edit(Note n){
         String whereClause = DbField.ID + " = ?";
         String[] whereArgs = new String[]{String.valueOf(n.getId())};
-
-        Log.d("DbHandler Edit", "Id: " + n.getId());
 
         ContentValues values = new ContentValues();
         values.put(DbField.TITLE, n.getTitle());
@@ -77,8 +73,6 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         int res = db.update(DbField.TABLE_NOTE, values, whereClause, whereArgs);
         db.close();
-
-        Log.d("DbHandler", "Pos: " + res);
 
         return res;
     }
@@ -129,7 +123,9 @@ public class DbHandler extends SQLiteOpenHelper {
         ArrayList<Note> notes = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + DbField.TABLE_NOTE + " WHERE " + DbField.TITLE + " LIKE '%" + text + "%'", null);
+
+        Cursor c = db.rawQuery("SELECT * FROM " + DbField.TABLE_NOTE + " WHERE " + DbField.TITLE + " LIKE '%" + checkEscape(text) + "%'", null);
+        System.out.println(text);
 
         if(c.moveToFirst()){
             do{
@@ -150,6 +146,10 @@ public class DbHandler extends SQLiteOpenHelper {
         db.close();
 
         return notes;
+    }
+
+    private String checkEscape(String text) {
+        return text.replaceAll("'", "''");
     }
 
     private int setSpecial(boolean special){
