@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +29,18 @@ import com.example.personale.noteexam.R;
 import com.example.personale.noteexam.controller.adapter.NoteAdapter;
 import com.example.personale.noteexam.controller.utilities.Field;
 import com.example.personale.noteexam.model.Note;
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.util.Arrays;
 
 /**
  * Created by personale on 13/03/2017.
@@ -32,17 +48,27 @@ import com.example.personale.noteexam.model.Note;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private static final int SIGN_IN = 156;
+    public NoteAdapter adapter;
     RecyclerView recyclerView;
     FloatingActionButton fabAdd;
     EditText searchEt;
-    NoteAdapter adapter;
     private int stateLayout;
     private int stateOrder;
+    FirebaseDatabase firebaseDatabase;
+    FirebaseAuth.AuthStateListener authStateListener;
+    DatabaseReference databaseReference;
+    FirebaseAuth firebaseAuth;
+    private boolean internetConnectionAbsent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
+
         fabAdd = (FloatingActionButton) findViewById(R.id.main_add_fab);
         recyclerView = (RecyclerView) findViewById(R.id.main_recycler_list);
         searchEt = (EditText) findViewById(R.id.main_search_et);
@@ -63,6 +89,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
+
+        authStateListener = new FirebaseAuth.AuthStateListener(){
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                if(user != null) {
+                    signIn(user.getDisplayName());
+                } else {
+                    startActivityForResult(AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setIsSmartLockEnabled(false)
+                            .setProviders(Arrays.asList(
+                                    new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
+                                    new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()
+                            ))
+                            .build(), SIGN_IN);
+                }
+            }
+        };
+    }
+
+    private void signIn(String name) {
+        Toast.makeText(this, "Welcome " + name + "!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void signOut() {
+        Toast.makeText(this, "Goodbye!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -71,6 +125,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.name_layout_preferences), Context.MODE_PRIVATE).edit();
         editor.putInt(getString(R.string.state_layout_preferences), stateLayout);
         editor.apply();
+
+        firebaseAuth.removeAuthStateListener(authStateListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(checkConnection()){
+            firebaseAuth.addAuthStateListener(authStateListener);
+        }
+    }
+
+    private boolean checkConnection(){
+        NetworkInfo info = ((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        return  info != null && info.isConnected();
     }
 
     @Override
@@ -89,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.menu_main_order:
                 setOrder(item);
                 break;
+            case R.id.save_db:
+                saveAsJson();
         }
 
         return super.onOptionsItemSelected(item);
@@ -98,17 +169,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(resultCode == Activity.RESULT_OK){
-            adapter.operationOnNote((Note) data.getParcelableExtra(Field.NOTE_OBJECT), data.getIntExtra(Field.POSITION, -1), requestCode);
+        switch (resultCode){
+            case Activity.RESULT_OK:
+                if(requestCode == SIGN_IN){
+                    Toast.makeText(this, "Signed in successfully!", Toast.LENGTH_SHORT).show();
 
-            if(requestCode == Field.ADD){
-                recyclerView.scrollToPosition(0);
-            }
-        } else {
-            Toast.makeText(this, Field.ERROR_FIELD, Toast.LENGTH_SHORT).show();
+                } else if(requestCode == Field.ADD || requestCode == Field.EDIT){
+                    adapter.operationOnNote((Note) data.getParcelableExtra(Field.NOTE_OBJECT), data.getIntExtra(Field.POSITION, -1), requestCode);
+
+                    if(requestCode == Field.ADD){
+                        recyclerView.scrollToPosition(0);
+                    }
+                } else {
+                    Toast.makeText(this, Field.ERROR_SIGN_IN, Toast.LENGTH_SHORT).show();
+                }
+
+                break;
+            case Activity.RESULT_CANCELED:
+                break;
         }
-
-        searchEt.setText("");
     }
 
     private void initializeComponent() {
@@ -173,9 +252,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setOrder(MenuItem order) {
         if(setItemOrder() == Field.ORDER_DESC){
-            order.setIcon(R.drawable.ic_desc);
-        } else {
             order.setIcon(R.drawable.ic_asc);
+        } else {
+            order.setIcon(R.drawable.ic_desc);
         }
     }
 
@@ -186,7 +265,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public int setItemOrder(){
         switch (stateOrder) {
             default:
-                System.out.println("OK");
                 stateOrder = Field.ORDER_DESC;
             case Field.ORDER_DESC:
                 adapter.order(stateOrder);
@@ -199,5 +277,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return stateOrder;
+    }
+
+    public void saveAsJson(){
+        for(Note n : adapter.getAllNotes()){
+            databaseReference.push().setValue(n);
+        }
     }
 }
